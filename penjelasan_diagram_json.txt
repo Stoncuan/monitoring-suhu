@@ -1,0 +1,343 @@
+================================================================
+        PENJELASAN DIAGRAM JSON - WOKWI SIMULATOR
+        Proyek: Monitoring Suhu & Kelembaban (ESP32 + DHT22)
+        Author: Stoncuan Macpal Bawangun
+================================================================
+
+
+================================================================
+BAGIAN 1: HEADER / INFORMASI UMUM
+================================================================
+
+  "version" : 1
+    => Versi format file diagram yang digunakan oleh Wokwi
+
+  "author"  : "Stoncuan Macpal Bawangun"
+    => Nama pembuat/pemilik diagram ini
+
+  "editor"  : "wokwi"
+    => Platform simulator yang digunakan untuk membuat rangkaian
+
+
+================================================================
+BAGIAN 2: PARTS — Komponen yang Digunakan
+================================================================
+
+Total komponen: 4 buah
+  1. ESP32 DevKit C V4  (board utama)
+  2. LED Magenta        (indikator)
+  3. Resistor 1kOhm     (pelindung LED)
+  4. Sensor DHT22       (sensor suhu & kelembaban)
+
+----------------------------------------------------------------
+KOMPONEN 1: ESP32 DevKit C V4
+----------------------------------------------------------------
+
+  "type" : "board-esp32-devkit-c-v4"
+    => Jenis board: ESP32 DevKit C versi 4
+    => Berfungsi sebagai otak/controller utama rangkaian
+
+  "id"   : "esp"
+    => ID unik komponen, digunakan untuk merujuk di bagian connections
+    => Contoh penggunaan: "esp:14" artinya pin GPIO 14 di ESP32
+
+  "top"  : 0
+  "left" : 0
+    => Posisi komponen di kanvas simulator
+    => ESP32 diletakkan di titik awal (0, 0) sebagai pusat
+
+  "attrs": {}
+    => Tidak ada atribut tambahan yang dikonfigurasi
+
+
+----------------------------------------------------------------
+KOMPONEN 2: LED (Warna Magenta)
+----------------------------------------------------------------
+
+  "type" : "wokwi-led"
+    => Jenis komponen: LED (Light Emitting Diode)
+
+  "id"   : "led1"
+    => ID unik: led1
+
+  "top"  : 34.8
+  "left" : 138.2
+    => Posisi LED di sebelah kanan ESP32
+
+  "attrs": { "color": "magenta" }
+    => Warna LED yang ditampilkan di simulator: Magenta (ungu-merah)
+    => Akan menyala saat GPIO 15 memberikan sinyal HIGH
+
+  Kaki-kaki LED:
+    led1:A => Anoda  (+) terhubung ke Resistor
+    led1:C => Katoda (-) terhubung ke GND
+
+
+----------------------------------------------------------------
+KOMPONEN 3: Resistor 1000 Ohm (1kOhm)
+----------------------------------------------------------------
+
+  "type"   : "wokwi-resistor"
+    => Jenis komponen: Resistor
+
+  "id"     : "r1"
+    => ID unik: r1
+
+  "top"    : 139.2
+  "left"   : 153.05
+    => Posisi resistor di bawah LED
+
+  "rotate" : 90
+    => Resistor dirotasi 90 derajat (posisi horizontal)
+
+  "attrs"  : { "value": "1000" }
+    => Nilai resistansi: 1000 Ohm = 1 kOhm
+
+  Fungsi Resistor:
+    => Membatasi arus yang mengalir ke LED
+    => Tanpa resistor, LED bisa terbakar karena arus terlalu besar
+    => Rumus: V = I x R
+               3.3V / 1000 Ohm = 0.0033 A = 3.3 mA (aman untuk LED)
+
+  Kaki-kaki Resistor:
+    r1:1 => terhubung ke Anoda LED
+    r1:2 => terhubung ke GPIO 15 ESP32
+
+
+----------------------------------------------------------------
+KOMPONEN 4: Sensor DHT22
+----------------------------------------------------------------
+
+  "type" : "wokwi-dht22"
+    => Jenis komponen: Sensor suhu dan kelembaban DHT22
+
+  "id"   : "dht1"
+    => ID unik: dht1
+
+  "top"  : 48.3
+  "left" : -101.4
+    => Posisi sensor di sebelah KIRI ESP32
+
+  "attrs": {
+    "humidity"   : "79"
+    "temperature": "37.5"
+  }
+    => Nilai simulasi yang akan dibaca oleh program:
+       - Kelembaban : 79%
+       - Suhu       : 37.5 derajat Celsius
+    => Di hardware asli, nilai ini dibaca langsung dari sensor fisik
+
+  Kaki-kaki DHT22:
+    dht1:VCC => Sumber daya (terhubung ke 3.3V)
+    dht1:SDA => Data (terhubung ke GPIO 14)
+    dht1:GND => Ground (terhubung ke GND)
+
+
+================================================================
+BAGIAN 3: CONNECTIONS — Sambungan Kabel
+================================================================
+
+Format penulisan:
+  [ "komponen1:pin", "komponen2:pin", "warna_kabel", [routing] ]
+
+----------------------------------------------------------------
+KONEKSI 1: Serial Monitor (TX)
+----------------------------------------------------------------
+
+  [ "esp:TX", "$serialMonitor:RX", "", [] ]
+
+  esp:TX           => Pin TX (Transmit) ESP32
+  $serialMonitor:RX => Pin RX Serial Monitor Wokwi
+  Warna: -         => Tidak ada warna (koneksi virtual)
+
+  Fungsi:
+    => Menghubungkan ESP32 ke Serial Monitor
+    => Digunakan untuk menampilkan pesan debug (Serial.print)
+    => Data mengalir dari ESP32 ke Serial Monitor
+
+
+----------------------------------------------------------------
+KONEKSI 2: Serial Monitor (RX)
+----------------------------------------------------------------
+
+  [ "esp:RX", "$serialMonitor:TX", "", [] ]
+
+  esp:RX           => Pin RX (Receive) ESP32
+  $serialMonitor:TX => Pin TX Serial Monitor Wokwi
+  Warna: -         => Tidak ada warna (koneksi virtual)
+
+  Fungsi:
+    => Jalur data dari Serial Monitor ke ESP32
+    => Digunakan jika ada input dari Serial Monitor
+
+
+----------------------------------------------------------------
+KONEKSI 3: Resistor ke LED
+----------------------------------------------------------------
+
+  [ "r1:1", "led1:A", "green", ["h0"] ]
+
+  r1:1    => Kaki 1 Resistor
+  led1:A  => Anoda (+) LED
+  Warna   : Hijau
+  Routing : "h0" (horizontal, jarak 0)
+
+  Fungsi:
+    => Menghubungkan resistor ke kaki positif LED
+    => Arus dari GPIO 15 melewati resistor dulu sebelum ke LED
+
+
+----------------------------------------------------------------
+KONEKSI 4: Power DHT22 (VCC)
+----------------------------------------------------------------
+
+  [ "dht1:VCC", "esp:3V3", "red", ["v0"] ]
+
+  dht1:VCC => Pin VCC (power) DHT22
+  esp:3V3  => Pin 3.3V ESP32
+  Warna    : Merah (konvensi = kabel power)
+  Routing  : "v0" (vertikal, jarak 0)
+
+  Fungsi:
+    => Memberikan sumber daya 3.3V ke sensor DHT22
+    => DHT22 beroperasi pada tegangan 3.3V - 5V
+
+
+----------------------------------------------------------------
+KONEKSI 5: Data DHT22 ke ESP32
+----------------------------------------------------------------
+
+  [ "dht1:SDA", "esp:14", "green", ["v0"] ]
+
+  dht1:SDA => Pin Data (SDA) DHT22
+  esp:14   => GPIO Pin 14 ESP32
+  Warna    : Hijau
+  Routing  : "v0" (vertikal, jarak 0)
+
+  Fungsi:
+    => Jalur pengiriman data suhu & kelembaban dari sensor ke ESP32
+    => Sesuai dengan "#define DHTPIN 14" di kode program
+
+
+----------------------------------------------------------------
+KONEKSI 6: GPIO 15 ke Resistor (Kontrol LED)
+----------------------------------------------------------------
+
+  [ "r1:2", "esp:15", "green", ["h0"] ]
+
+  r1:2   => Kaki 2 Resistor
+  esp:15 => GPIO Pin 15 ESP32
+  Warna  : Hijau
+  Routing: "h0" (horizontal, jarak 0)
+
+  Fungsi:
+    => GPIO 15 mengontrol nyala/mati LED
+    => Saat GPIO 15 HIGH => arus mengalir => LED menyala
+    => Saat GPIO 15 LOW  => tidak ada arus => LED mati
+
+
+----------------------------------------------------------------
+KONEKSI 7: Ground DHT22
+----------------------------------------------------------------
+
+  [ "dht1:GND", "esp:GND.1", "black", ["v0"] ]
+
+  dht1:GND  => Pin GND (ground) DHT22
+  esp:GND.1 => Pin Ground ESP32 (nomor 1)
+  Warna     : Hitam (konvensi = kabel ground)
+  Routing   : "v0" (vertikal, jarak 0)
+
+  Fungsi:
+    => Menghubungkan ground sensor ke ground ESP32
+    => Wajib ada agar rangkaian DHT22 berfungsi
+
+
+----------------------------------------------------------------
+KONEKSI 8: Ground LED
+----------------------------------------------------------------
+
+  [ "esp:GND.3", "led1:C", "black", ["h0"] ]
+
+  esp:GND.3 => Pin Ground ESP32 (nomor 3)
+  led1:C    => Katoda (-) LED
+  Warna     : Hitam (konvensi = kabel ground)
+  Routing   : "h0" (horizontal, jarak 0)
+
+  Fungsi:
+    => Menghubungkan kaki negatif LED ke ground ESP32
+    => Melengkapi rangkaian LED agar bisa menyala
+
+
+================================================================
+BAGIAN 4: TABEL RINGKASAN KONEKSI
+================================================================
+
+  No | Dari          | Ke               | Warna  | Fungsi
+  ---|---------------|------------------|--------|------------------
+  1  | esp:TX        | $serialMonitor:RX| -      | Debug Serial
+  2  | esp:RX        | $serialMonitor:TX| -      | Debug Serial
+  3  | r1:1          | led1:A           | Hijau  | Resistor ke LED
+  4  | dht1:VCC      | esp:3V3          | Merah  | Power DHT22
+  5  | dht1:SDA      | esp:14           | Hijau  | Data DHT22
+  6  | r1:2          | esp:15           | Hijau  | Kontrol LED
+  7  | dht1:GND      | esp:GND.1        | Hitam  | Ground DHT22
+  8  | esp:GND.3     | led1:C           | Hitam  | Ground LED
+
+
+================================================================
+BAGIAN 5: SKEMA RANGKAIAN
+================================================================
+
+  [3.3V] -----(Merah)------- VCC (DHT22)
+  [GND]  -----(Hitam)------- GND (DHT22)
+  [GPIO14]----(Hijau)------- SDA (DHT22)  <-- Baca data sensor
+
+  [GPIO15]----(Hijau)---[R1: 1kOhm]---(Hijau)--- Anoda(+) LED
+                                                        |
+  [GND]  -----(Hitam)-------------------------- Katoda(-) LED
+
+
+================================================================
+BAGIAN 6: POSISI KOMPONEN DI KANVAS
+================================================================
+
+  Kiri (-101)        Tengah (0)         Kanan (138-153)
+  _______________    _______________    _______________
+  |             |   |             |   |     |       |
+  |   DHT22     |   |   ESP32     |   |    LED    R1 |
+  |  (top:48)   |   |  (top:0)    |   | (top:34) (top:139)|
+  |_____________|   |_____________|   |_______________|
+
+
+================================================================
+BAGIAN 7: FUNGSI SETIAP KOMPONEN
+================================================================
+
+  Komponen     | Fungsi Utama
+  -------------|----------------------------------------------
+  ESP32        | Otak/controller: baca sensor, proses data,
+               | kirim ke Firebase via WiFi
+  -------------|----------------------------------------------
+  DHT22        | Sensor: mengukur suhu (37.5C) dan
+               | kelembaban (79%) secara simulasi
+  -------------|----------------------------------------------
+  LED Magenta  | Indikator visual: menyala sebagai tanda
+               | sistem sedang aktif/bekerja
+  -------------|----------------------------------------------
+  Resistor 1kO | Pelindung LED: membatasi arus agar LED
+               | tidak rusak/terbakar
+
+
+================================================================
+BAGIAN 8: DEPENDENCIES
+================================================================
+
+  "dependencies": {}
+    => Tidak ada dependensi eksternal tambahan
+    => Library dikelola melalui file platformio.ini:
+       lib_deps = adafruit/DHT sensor library
+
+
+================================================================
+                        SELESAI
+================================================================

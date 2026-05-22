@@ -1,0 +1,210 @@
+================================================================
+     PENJELASAN RANGKAIAN - GAMBAR WOKWI SIMULATOR
+     Proyek: Monitoring Suhu & Kelembaban (ESP32 + DHT22)
+================================================================
+
+
+================================================================
+DAFTAR ALAT / KOMPONEN YANG TERLIHAT DI GAMBAR
+================================================================
+
+  Total Komponen: 4 buah
+  1. ESP32 DevKit C V4   => Mikrokontroler utama
+  2. Sensor DHT22        => Sensor suhu & kelembaban
+  3. LED Magenta/Ungu    => Lampu indikator
+  4. Resistor            => Pembatas arus LED
+
+
+================================================================
+KOMPONEN 1: ESP32 DevKit C V4
+================================================================
+
+  Posisi  : Tengah (pusat rangkaian)
+  Warna   : Hitam (papan PCB)
+
+  Deskripsi:
+    => Mikrokontroler berbasis chip ESP32 buatan Espressif
+    => Merupakan "otak" dari seluruh sistem rangkaian
+    => Memiliki kemampuan WiFi dan Bluetooth built-in
+    => Terdapat antena WiFi di bagian atas board (chip abu-abu)
+    => Terdapat tombol EN (Enable/Reset) dan Boot di bagian bawah
+    => Menggunakan port Micro-USB untuk pemrograman & power
+
+  Spesifikasi Umum:
+    => CPU        : Dual-core Xtensa LX6, 240 MHz
+    => RAM        : 520 KB SRAM
+    => Flash      : 4 MB
+    => WiFi       : 802.11 b/g/n (2.4 GHz)
+    => GPIO       : 30+ pin input/output
+    => Tegangan   : 3.3V (input bisa 5V via USB)
+
+  Pin yang Digunakan:
+    => 3V3    : Memberikan tegangan 3.3V ke DHT22 (kabel merah)
+    => GND    : Ground untuk DHT22 dan LED (kabel hitam)
+    => GPIO14 : Menerima data dari sensor DHT22 (kabel hijau)
+    => GPIO15 : Mengirim sinyal kontrol ke LED via resistor
+
+  Fungsi dalam Proyek:
+    => Membaca data suhu & kelembaban dari DHT22
+    => Menghubungkan ke WiFi
+    => Mengirim data ke Firebase Realtime Database
+    => Mengontrol nyala/mati LED sebagai indikator
+
+
+================================================================
+KOMPONEN 2: Sensor DHT22
+================================================================
+
+  Posisi  : Kiri (sebelah kiri ESP32)
+  Warna   : Putih (badan sensor)
+  Label   : Tertulis "DHT22" di gambar
+
+  Deskripsi:
+    => Sensor digital untuk mengukur suhu dan kelembaban udara
+    => Bentuk fisik: kotak putih dengan lubang ventilasi di depan
+    => Lubang-lubang kecil berfungsi sebagai jalur udara masuk
+       agar sensor dapat mengukur kondisi udara sekitar
+
+  Spesifikasi:
+    => Rentang Suhu      : -40°C hingga +80°C
+    => Akurasi Suhu      : ±0.5°C
+    => Rentang Kelembaban: 0% hingga 100% RH
+    => Akurasi Kelembaban: ±2-5% RH
+    => Tegangan Kerja    : 3.3V - 5V
+    => Protokol Data     : Single-wire digital
+
+  Kaki/Pin DHT22 (dari kiri ke kanan):
+    => VCC  : Sumber daya positif (3.3V dari ESP32)
+    => SDA  : Data signal (terhubung ke GPIO14 ESP32)
+    => GND  : Ground (0V)
+
+  Sambungan Kabel:
+    => Kabel MERAH  : VCC DHT22 => 3V3 ESP32 (sumber daya)
+    => Kabel HIJAU  : SDA DHT22 => GPIO14 ESP32 (data)
+    => Kabel HITAM  : GND DHT22 => GND ESP32 (ground)
+
+  Nilai Simulasi di Wokwi:
+    => Suhu       : 37.5 derajat Celsius
+    => Kelembaban : 79%
+
+  Fungsi dalam Proyek:
+    => Mengukur suhu udara sekitar
+    => Mengukur kelembaban udara sekitar
+    => Mengirimkan data ke ESP32 setiap 5 detik
+
+
+================================================================
+KOMPONEN 3: LED (Light Emitting Diode) - Warna Magenta/Ungu
+================================================================
+
+  Posisi  : Kanan atas (sebelah kanan ESP32)
+  Warna   : Magenta / Ungu
+
+  Deskripsi:
+    => Komponen semikonduktor yang memancarkan cahaya
+    => Berfungsi sebagai indikator visual sistem
+    => Menyala ketika GPIO15 ESP32 memberikan sinyal HIGH
+    => Mati ketika GPIO15 ESP32 memberikan sinyal LOW
+
+  Kaki LED:
+    => Anoda  (+) : Kaki positif, lebih panjang
+                    Terhubung ke kaki resistor
+    => Katoda (-) : Kaki negatif, lebih pendek
+                    Terhubung ke GND ESP32 (kabel hitam)
+
+  Sambungan Kabel:
+    => Kabel HITAM : Katoda LED => GND ESP32
+    => (via Resistor): Anoda LED => R1 => GPIO15 ESP32
+
+  Spesifikasi Umum LED:
+    => Tegangan maju (Vf) : ~2.0V - 3.5V
+    => Arus kerja         : 10mA - 20mA
+    => Arus aman dengan R 1kOhm pada 3.3V = 3.3mA
+
+  Fungsi dalam Proyek:
+    => Indikator bahwa sistem sedang aktif/bekerja
+    => Bisa diprogram untuk berkedip saat kirim data ke Firebase
+
+
+================================================================
+KOMPONEN 4: Resistor
+================================================================
+
+  Posisi  : Kanan bawah (di bawah LED)
+  Warna   : Gelang coklat-hitam-merah (kode warna resistor)
+  Nilai   : 1000 Ohm = 1 kOhm
+
+  Deskripsi:
+    => Komponen pasif yang membatasi aliran arus listrik
+    => Dipasang seri antara GPIO15 ESP32 dan Anoda LED
+    => WAJIB dipasang agar LED tidak rusak karena kelebihan arus
+
+  Cara Membaca Kode Warna:
+    => Gelang 1 (Coklat) : Angka 1
+    => Gelang 2 (Hitam)  : Angka 0
+    => Gelang 3 (Merah)  : Pengali x100
+    => Nilai: 10 x 100 = 1000 Ohm = 1 kOhm
+
+  Perhitungan Arus:
+    => Rumus    : I = V / R
+    => Tegangan : 3.3V (dari GPIO ESP32)
+    => Resistansi: 1000 Ohm
+    => Arus     : 3.3V / 1000 Ohm = 0.0033 A = 3.3 mA
+    => 3.3 mA sangat aman untuk LED (batas max ~20mA)
+
+  Sambungan:
+    => Kaki 1 : Terhubung ke Anoda (+) LED
+    => Kaki 2 : Terhubung ke GPIO15 ESP32 (kabel hijau)
+
+  Fungsi dalam Proyek:
+    => Melindungi LED dari arus berlebih
+    => Memastikan LED menyala dengan brightness yang aman
+
+
+================================================================
+RINGKASAN ALIRAN ARUS / CARA KERJA RANGKAIAN
+================================================================
+
+  JALUR 1 - Power DHT22:
+  [3.3V ESP32] ---(merah)---> [VCC DHT22]
+  [GND ESP32]  ---(hitam)---> [GND DHT22]
+
+  JALUR 2 - Data DHT22 ke ESP32:
+  [DHT22 SDA] ---(hijau)---> [GPIO14 ESP32]
+    => DHT22 mengirimkan data suhu & kelembaban ke ESP32
+
+  JALUR 3 - Kontrol LED:
+  [GPIO15 ESP32] ---(hijau)---> [Resistor 1kOhm] ---> [Anoda LED]
+  [Katoda LED]   ---(hitam)---> [GND ESP32]
+    => ESP32 mengontrol nyala/mati LED melalui GPIO15
+
+
+================================================================
+TABEL RINGKASAN KOMPONEN
+================================================================
+
+  No | Komponen    | Posisi      | Fungsi Utama
+  ---|-------------|-------------|--------------------------------
+  1  | ESP32       | Tengah      | Otak sistem, WiFi, proses data
+  2  | DHT22       | Kiri        | Ukur suhu & kelembaban
+  3  | LED Magenta | Kanan atas  | Indikator visual sistem aktif
+  4  | Resistor 1k | Kanan bawah | Pelindung arus LED
+
+
+================================================================
+TABEL KONEKSI KABEL
+================================================================
+
+  Warna Kabel | Dari            | Ke              | Fungsi
+  ------------|-----------------|-----------------|-------------
+  Merah       | DHT22 VCC       | ESP32 3V3       | Power sensor
+  Hijau       | DHT22 SDA       | ESP32 GPIO14    | Data sensor
+  Hitam       | DHT22 GND       | ESP32 GND       | Ground sensor
+  Hitam       | LED Katoda (-)  | ESP32 GND       | Ground LED
+  Hijau       | Resistor kaki 2 | ESP32 GPIO15    | Kontrol LED
+  (dalam)     | Resistor kaki 1 | LED Anoda (+)   | Sambung R-LED
+
+
+================================================================
+                         SELESAI
+================================================================
